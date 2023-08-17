@@ -39,7 +39,7 @@ Coordinator 就相当于主从架构的主，Worker 就是从，由 Coordinator 
 
 对上面的四点，画了个大概的时序图
 
-![162249199277.png](https://github.com/fducsding/presto-teach/blob/master/03_%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B/vx_images/162249199277.png?raw=true)
+![162249199277.png](../../img/162249199277.png)
 
 接下来详细解读这4个流程
 
@@ -435,7 +435,7 @@ public class DistributedStore {
 
 简单讲一下 store 的大概流程，Presto 在启动的时候会 DiscoveryModule 或 EmbeddedDiscoveryModule 来判断服务发现。如果是内嵌的方式启动，那么就是在 Coordinator 中维护了一个 ConcurrentMap 来存储注册信息。如果是独立部署的话，会使用 leveldb 来存储注册信息。
 
-![3183894766800.png](https://github.com/fducsding/presto-teach/blob/master/03_%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B/vx_images/3183894766800.png?raw=true)
+![3183894766800.png](../../img/3183894766800.png)
 
 存储的注册信息内容如下：
 
@@ -466,7 +466,7 @@ public class DistributedStore {
 
 看完代码，我们再搭配一下时序图，可以更好的理解流程。
 
-![2122828756614.png](https://github.com/fducsding/presto-teach/blob/master/03_%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B/vx_images/2122828756614.png?raw=true)
+![2122828756614.png](../../img/2122828756614.png)
 
 最后我们还可以在日志中发现请求是每 8 秒来一次。
 
@@ -846,7 +846,7 @@ private void pollWorkers()
 
 pollWorkers 后续的流程，先用时序图表示了，时序图如下
 
-![1034546555706.png](https://github.com/fducsding/presto-teach/blob/master/03_%E9%80%9A%E4%BF%A1%E6%B5%81%E7%A8%8B/vx_images/1034546555706.png?raw=true)
+![1034546555706.png](../../img/1034546555706.png)
 
 节点状态通过请求/v1/info/state获取。
 
@@ -964,7 +964,142 @@ Coordinator 需要工作时会调用 get 相关的方法获得 Worker 的信息�
 
 > 单独启动discovery服务，然后再启动keepalived服务。keepalived会有个VIP（虚拟IP），将trino的discovery.uri的IP地址改写成VIP。
 
-**有个问题，当服务发现地址改写成VIP后，怎么把请求发送给真正的服务器那？**fas
+## 两个服务发现怎么同步节点信息
+
+每个discovery server 服务都在Replicator类中由start方法（start有@PostConstruct）启动定时同步线程，将其他discovery server节点中的trino节点信息同步过来，默认是1分钟刷新一次，如果节点是本节点，则不做同步
+
+```java
+//io.airlift.discovery.store.Replicator(在discovery服务端的源码)
+
+@PostConstruct
+public synchronized void start()
+{
+        if (future == null) {
+            //创建一个单个线程池
+            executor = newSingleThreadScheduledExecutor(daemonThreadsNamed("replicator-" + name));
+            //这个线程池以1分钟为频率刷新一次
+            future = executor.scheduleAtFixedRate(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try {
+                        synchronize();
+                    }
+                    catch (Throwable t) {
+                        log.warn(t, "Error replicating state");
+                    }
+                }
+            }, 0, replicationInterval.toMillis(), TimeUnit.MILLISECONDS);
+        }
+
+        // TODO: need fail-safe recurrent scheduler with variable delay
+}
+
+//看下synchronize方法
+private void synchronize()
+    {
+  			//selector是由DiscoveryServiceSelector实现的
+        //首先是通过selector.selectAllServices()获取所有的发现服务节点
+        for (ServiceDescriptor descriptor : selector.selectAllServices()) {
+            if (descriptor.getNodeId().equals(node.getNodeId())) {
+                // 如果是本节点就不同步
+                continue;
+            }
+						// 获得其他服务节点的uri
+            String uri = descriptor.getProperties().get("http");
+            if (uri == null) {
+                log.error("service descriptor for node %s is missing http uri", descriptor.getNodeId());
+                continue;
+            }
+
+            // 构造一个请求
+            Request request = Request.Builder.prepareGet()
+                    .setUri(URI.create(uri + "/v1/store/" + name))
+                    .build();
+
+            try {
+                httpClient.execute(request, new ResponseHandler<Void, Exception>()
+                {
+                   // ...
+                    @Override
+                    public Void handle(Request request, Response response)
+                            throws Exception
+                    {
+                        if (response.getStatusCode() == 200) {
+                            try {
+                                List<Entry> entries = mapper.readValue(response.getInputStream(), new TypeReference<List<Entry>>() {});
+                                for (Entry entry : entries) {
+                                    // 请求成功，将节点信息保存到本地
+                                    localStore.put(entry);
+                                }
+                            }
+                            // ..
+           
+        }
+    }
+```
+
+selector的实现是DiscoveryServiceSelector，我们看一下selectAllServices()方法逻辑
+
+```java
+//io.airlift.discovery.server.DiscoveryServiceSelector
+//其实就是从inventory配置文件中拿到相关信息，其中包含另外一台discovery server的uri
+//getType()返回的是discovery
+public List<ServiceDescriptor> selectAllServices()
+    {
+        return ImmutableList.copyOf(inventory.getServiceDescriptors(getType()));
+    }
+
+//io.airlift.discovery.client.ServiceInventory
+//其中serviceDescriptors是AtomicReference<List<ServiceDescriptor>>类型，包装了ServiceDescriptor
+public Iterable<ServiceDescriptor> getServiceDescriptors(String type)
+    {
+        return serviceDescriptors.get().stream()
+                .filter(descriptor -> descriptor.getType().equals(type))
+                .collect(toList());
+    }
+
+//我们继续看下ServiceDescriptor类
+//这个类的构造方法由@JsonCreator注解，表示生成这个对象时由json文件中的数据进行构造
+public class ServiceDescriptor
+{
+    private final UUID id;
+    private final String nodeId;
+    private final String type;
+    private final String pool;
+    private final String location;
+    private final ServiceState state;
+    private final Map<String, String> properties;
+
+    @JsonCreator
+    public ServiceDescriptor(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("nodeId") String nodeId,
+            @JsonProperty("type") String type,
+            @JsonProperty("pool") String pool,
+            @JsonProperty("location") String location,
+            @JsonProperty("state") ServiceState state,
+            @JsonProperty("properties") Map<String, String> properties)
+}
+
+```
+
+其中inventory.getServiceDescriptors获取的就是service-inventory.json配置文件中的信息
+
+![ing](../../img/Snipaste_2023-08-17_13-47-38.png)
+
+**配置文件service-inventory.json如下:**
+
+![image-20230817111553816](/Users/ding/Desktop/myBlogs/docs/大数据/img/Snipaste_2023-08-17_11-18-08.png)
+
+
+
+
+
+## keepalived
+
+**有个问题，当服务发现地址改写成VIP后，怎么把请求发送给真正的服务器那？**
 
 > Keepalived 根据目标 IP 地址来决定是否将数据包交给真正的服务处理，通常是通过 Linux 内核的网络路由功能来实现的。具体来说，当 VIP（虚拟 IP）被绑定到一个节点上时，这个节点会接收到传入的数据包，然后根据数据包的目标 IP 地址来判断是否将其交给真正的服务处理。
 >
