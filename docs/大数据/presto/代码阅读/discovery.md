@@ -1,7 +1,3 @@
-[toc]
-
-
-
 # 服务发现-主要流程介绍篇
 
 ---
@@ -1091,7 +1087,7 @@ public class ServiceDescriptor
 
 **配置文件service-inventory.json如下:**
 
-![image-20230817111553816](/Users/ding/Desktop/myBlogs/docs/大数据/img/Snipaste_2023-08-17_11-18-08.png)
+![image-20230817111553816](../../img/Snipaste_2023-08-17_11-18-08.png)
 
 
 
