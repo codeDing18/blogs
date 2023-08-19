@@ -855,7 +855,9 @@ pollWorkers 后续的流程，先用时序图表示了，时序图如下
 2019-12-30T20:51:58.47Z 172.31.12.132   GET     /v1/info/state  null    null    200     0       9       1       f2b3905f1ba842e4957ad46855b567f700000048d0      HTTP/1.1        0       0       0       null
 ```
 
-## 扩展理解：如何检查没有可用的工作节点
+## 扩展理解
+
+### 如何检查没有可用的工作节点
 
 当先前注册的节点消失时，DiscoveryNodeManager 会将以前的活动节点丢失记录到 server.log。
 
@@ -956,11 +958,13 @@ Coordinator 需要工作时会调用 get 相关的方法获得 Worker 的信息�
 
 
 
-# 服务发现的HA
+
+
+## 服务发现HA
 
 > 单独启动discovery服务，然后再启动keepalived服务。keepalived会有个VIP（虚拟IP），将trino的discovery.uri的IP地址改写成VIP。
 
-## 两个服务发现怎么同步节点信息
+### 两个服务发现怎么同步节点信息
 
 每个discovery server 服务都在Replicator类中由start方法（start有@PostConstruct）启动定时同步线程，将其他discovery server节点中的trino节点信息同步过来，默认是1分钟刷新一次，如果节点是本节点，则不做同步
 
