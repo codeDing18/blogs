@@ -8,7 +8,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
   <!--主题样式-->
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple-dark.css"> -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css"> -->
+  <link rel="stylesheet" href="//unpkg.com/docsify/lib/themes/vue.css" />
 
 
 </head>
@@ -19,7 +20,9 @@
       name: 'myBlogs',
       repo: 'https://github.com/fducsding/blogs',
       loadSidebar: true,
-      subMaxLevel: 2,
+      // subMaxLevel: 2,
+      // 表情 :smile:  :partying_face:  :joy:  :+1:  :-1:
+      nativeEmoji: true,
       // maxLevel: 4,
       coverpage: false,
       // 跳转后自动到顶部
@@ -27,12 +30,13 @@
       
       // PLUGINS
       // ----------------------------------------------------------------
-      // 页面右侧toc
-      // toc: {
-      //     tocMaxLevel: 2,
-      //     target: "h2, h3, h4, h5, h6",
-      //     color: red,
-      // },
+      页面右侧toc
+      toc: {
+          tocMaxLevel: 2,
+          target: "h2, h3, h4, h5, h6",
+          color: red,
+
+      },
       // 底部导航
       pagination: {
           previousText: "上一页",
@@ -106,7 +110,8 @@
     <script src="https://cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
 
     <!-- 页面右侧 TOC -->
-    <script src="https://cdn.jsdelivr.net/npm/docsify-plugin-toc@1.1.0/dist/docsify-plugin-toc.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/docsify-plugin-toc@1.1.0/dist/docsify-plugin-toc.min.js"></script> -->
+    <script src="https://unpkg.com/docsify-plugin-toc@1.3.1/dist/docsify-plugin-toc.min.js"></script>
 
 
 </body>
