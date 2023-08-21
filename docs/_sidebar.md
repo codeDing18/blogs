@@ -9,7 +9,7 @@
   - [alluxio](大数据/alluxio/)
 - [高可用HA](高可用HA/)
   - [keepalived](高可用HA/keepalived.md)
-- [Git](git.md/)
+- [Git](git.md)
 
 
 
