@@ -49,15 +49,32 @@ d.把修改后的本地分支与远程分支关联
 ## 保存当前修改
 
 ```bash
-git stash "修改的信息"
-//列出保存的所有版本，出现如下形式
+git stash save "修改的信息"
+#列出保存的所有版本，出现如下形式
 git stash list 
 stash@{0}: On order-master-bugfix: 22222
 stash@{1}: On order-master-bugfix: 22222
-//选择指定栈中的一个版本
+#选择指定栈中的一个版本
 git stash apply stash@{0}
-//将stash栈中最后一个版本取出来
+#将stash栈中最后一个版本取出来
 git stash pop
+# 将指定index的储藏从储藏记录列表中删除
+git stash drop stash@{index}
+```
+
+
+
+## git tag
+
+[参考链接](https://blog.csdn.net/qq_39505245/article/details/124705850)
+
+```bash
+# 检出标签的理解 ： 我想在这个标签的基础上进行其他的开发或操作。
+#检出标签的操作实质 ： 就是以标签指定的版本为基础版本，新建一个分支，继续其他的操作。
+#因此 ，就是 新建分支的操作了。
+git checkout -b 分支名称 标签名称
+
+
 ```
 
 

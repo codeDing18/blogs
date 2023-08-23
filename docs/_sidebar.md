@@ -6,9 +6,13 @@
     - [代码阅读](大数据/presto/代码阅读/)
       - [服务发现](大数据/presto/代码阅读/discovery.md)
   - [spark](大数据/spark/)
+  - [hive](hive/)
+    - [安装配置](hive/安装配置.md)
+  - [hadoop](大数据/hadoop)
+    - [安装配置](大数据/hadoop/安装配置.md)
   - [alluxio](大数据/alluxio/)
-- [高可用HA](高可用HA/)
-  - [keepalived](高可用HA/keepalived.md)
+- [HA](HA/)
+  - [keepalived](HA/keepalived.md)
 - [Git](git.md)
 
 
