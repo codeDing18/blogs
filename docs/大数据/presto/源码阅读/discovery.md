@@ -149,7 +149,7 @@ protected void setup(Binder binder)
 
 准备了一个测试环境，启动了2个节点，1个Coordinator，1个Worker。
 
-在接口中查看到以下数据，并且发现2台节点应该是都注册的 Client，另一个节点因为是 Coordinator 它是还多注册了一个 server。
+在接口中查看到以下数据，并且发现2台节点应该是都注册的 Client，另一个节点因为是 Coordinator 它还多注册了一个 server。
 
 ```json
 {
@@ -252,7 +252,7 @@ private ListenableFuture<Duration> announce(long delayStart, Duration expectedDe
             errorBackOff.success();
 
             // wait 80% of the suggested delay
-            expectedDelay = new Duration(expectedDelay.toMillis() * 0.8, MILLISECONDS); // 在这里计算得出的8秒，我们继续看下面的代码，看 expectedDela y是怎么变成10秒的
+            expectedDelay = new Duration(expectedDelay.toMillis() * 0.8, MILLISECONDS); // 在这里计算得出的8秒，我们继续看下面的代码，看 expectedDelay是怎么变成10秒的
             log.debug("Service announcement succeeded after %s. Next request will happen within %s", Duration.nanosSince(requestStart), expectedDelay);
 
             scheduleNextAnnouncement(expectedDelay); // 下一次的announce

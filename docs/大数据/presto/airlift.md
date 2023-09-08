@@ -47,121 +47,73 @@ Airlift 包含 [jmxutils](https://github.com/martint/jmxutils)，可以非常方
 </dependency>
 ```
 
-然后我们 Service 中新增 JMX 模块:
+我们可以通过 @Managed对外暴露出一些指标。
 
 ```java
-package org.example;
+package org.example.airlift.jmxutils;
 
-import io.airlift.bootstrap.Bootstrap;
-import io.airlift.event.client.EventModule;
-import io.airlift.http.server.HttpServerModule;
-import io.airlift.jaxrs.JaxrsModule;
-import io.airlift.jmx.JmxHttpModule;
-import io.airlift.jmx.JmxModule;
-import io.airlift.jmx.http.rpc.JmxHttpRpcModule;
-import io.airlift.json.JsonModule;
-import io.airlift.node.NodeModule;
-import org.weakref.jmx.guice.MBeanModule;
-
-public class Service
-{
-    public static void main(String[] args)
-    {
-        Bootstrap app = new Bootstrap(new ServiceModule(),
-                new JmxModule(),
-                new JmxHttpModule(),
-                new JmxHttpRpcModule(),
-                new MBeanModule(),
-                new NodeModule(),
-                new HttpServerModule(),
-                new EventModule(),
-                new JsonModule(),
-                new JaxrsModule());
-        app.initialize();
-    }
-
-    private Service()
-    {
-    }
-}
-```
-
-添加完模块化，我们可以对外暴露出一些指标，例如访问 Rest 接口的计数指标。
-
-```java
-package org.example;
-
-import io.airlift.log.Logger;
 import org.weakref.jmx.Managed;
 
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+public class ServiceResource {
 
-import java.util.concurrent.atomic.AtomicLong;
-
-@Path("/v1/service")
-public class ServiceResource
-{
-    // 获取logger
-    private static final Logger LOG = Logger.get(ServiceResource.class);
-
-    private final ServiceConfig config;
-    private final AtomicLong helloCount = new AtomicLong();
-
-    @Inject
-    public ServiceResource(ServiceConfig config)
+    @Managed
+    public int getHelloCount()
     {
-        this.config = config;
-    }
-
-    @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public String hello()
-    {
-        String message = config.getHelloMessage();
-        Long count = helloCount.incrementAndGet();
-        // 打印日志
-        LOG.info("call Hello Function %d and return %s", count, message);
-        return message;
+        return 4;
     }
 
     @Managed
-    public long getHelloCount()
-    {
-        return helloCount.get();
+    public void dosomething(){
+
     }
 }
+
 ```
 
 最后，在 module 上注册绑定。
 
 ```java
-package org.example;
+package org.example.airlift.jmxutils;
 
 import com.google.inject.Binder;
-import com.google.inject.Module;
 
-import static io.airlift.configuration.ConfigBinder.configBinder;
-import static io.airlift.jaxrs.JaxrsBinder.jaxrsBinder;
+import com.google.inject.Injector;
+import com.google.inject.Module;
+import io.airlift.bootstrap.Bootstrap;
+import org.weakref.jmx.guice.MBeanModule;
+
+import javax.management.MBeanServer;
+
+import java.lang.management.ManagementFactory;
+
 import static org.weakref.jmx.guice.ExportBinder.newExporter;
 
-public class ServiceModule
-        implements Module
-{
+public class ServiceModule implements Module {
     @Override
-    public void configure(Binder binder)
-    {
-        jaxrsBinder(binder).bind(ServiceResource.class);
-        configBinder(binder).bindConfig(ServiceConfig.class);
+    public void configure(Binder binder) {
+        binder.bind(MBeanServer.class).toInstance(ManagementFactory.getPlatformMBeanServer());
+        binder.bind(ServiceResource.class);
         newExporter(binder).export(ServiceResource.class).withGeneratedName();
     }
+
+
+    public static void main(String[] args) {
+
+        Bootstrap bootstrap = new Bootstrap(new MBeanModule(), new ServiceModule());
+        Injector injector = bootstrap.initialize();
+
+        while(true){
+
+        }
+
+    }
 }
+
 ```
 
 启动服务后，通过 jconsole查看。
+
+![](../img/Snipaste_2023-09-08_16-02-02.png)
 
 
 
