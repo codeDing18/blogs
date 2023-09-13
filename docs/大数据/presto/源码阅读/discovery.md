@@ -35,7 +35,7 @@ Coordinator 就相当于主从架构的主，Worker 就是从，由 Coordinator 
 
 对上面的四点，画了个大概的时序图
 
-![162249199277.png](../../img/162249199277.png)
+![162249199277.png](../../../img/162249199277.png)
 
 接下来详细解读这4个流程
 
@@ -431,7 +431,7 @@ public class DistributedStore {
 
 简单讲一下 store 的大概流程，Presto 在启动的时候会 DiscoveryModule 或 EmbeddedDiscoveryModule 来判断服务发现。如果是内嵌的方式启动，那么就是在 Coordinator 中维护了一个 ConcurrentMap 来存储注册信息。如果是独立部署的话，会使用 leveldb 来存储注册信息。
 
-![3183894766800.png](../../img/3183894766800.png)
+![3183894766800.png](../../../img/3183894766800.png)
 
 存储的注册信息内容如下：
 
@@ -462,7 +462,7 @@ public class DistributedStore {
 
 看完代码，我们再搭配一下时序图，可以更好的理解流程。
 
-![2122828756614.png](../../img/2122828756614.png)
+![2122828756614.png](../../../img/2122828756614.png)
 
 最后我们还可以在日志中发现请求是每 8 秒来一次。
 
@@ -842,7 +842,7 @@ private void pollWorkers()
 
 pollWorkers 后续的流程，先用时序图表示了，时序图如下
 
-![1034546555706.png](../../img/1034546555706.png)
+![1034546555706.png](../../../img/1034546555706.png)
 
 节点状态通过请求/v1/info/state获取。
 
@@ -1087,11 +1087,11 @@ public class ServiceDescriptor
 
 其中inventory.getServiceDescriptors获取的就是service-inventory.json配置文件中的信息
 
-![ing](../../img/Snipaste_2023-08-17_13-47-38.png)
+![ing](../../../img/Snipaste_2023-08-17_13-47-38.png)
 
 **配置文件service-inventory.json如下:**
 
-![image-20230817111553816](../../img/Snipaste_2023-08-17_11-18-08.png)
+![image-20230817111553816](../../../img/Snipaste_2023-08-17_11-18-08.png)
 
 
 

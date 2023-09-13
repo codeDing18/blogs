@@ -10,7 +10,7 @@
 
 ## 1.从架构上看SQL Query的执行流程
 
-![Snipaste_2023-08-21_16-55-53.png](../../img/Snipaste_2023-08-21_16-55-53.png)
+<img src="../../../img/Snipaste_2023-08-21_16-55-53.png" alt="Snipaste_2023-08-21_16-55-53.png" style="zoom:50%;" />
 
 请参见上面的架构图，从用户开始写SQL开始到查询结果返回，我们划分出以下几个部分：
 
@@ -50,7 +50,7 @@
 
 从第一步到第八步，主要描述的是Presto对一个传入的SQL语句如何进行解析并生成最终的执行计划，生成Query执行计划的主要流程如下图所示：
 
-![11](../../img/Snipaste_2023-08-24_09-35-47.png)
+![11](../../../img/Snipaste_2023-08-24_09-35-47.png)
 
 可以看到，自第一步至第九步，全部是在Presto Coodinator上完成，足见Coordinator的核心地位，阅读Presto源码时你也会发现它的代码是极其复杂的，我前前后后阅读了十几遍，debug了几十遍才有了今天的这份自信来将我的经验输出到互联网上帮助你更高效的掌握它；第十步是在Presto Worker上执行；第十一步是在Presto Coordinator上执行，并将查询结果分批返回给客户端(如Presto SQL Client或者其他JDBC客户端)。
 
@@ -232,7 +232,7 @@ SqlParser的实现，使用了Antlr4作为解析工具。它首先定义了Antlr
 
 > 注：词法分析与语法分析都是由Antlr4生成，见下图所示
 
-<img src="../../img/Snipaste_2023-08-24_14-30-26.png" alt="1" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-08-24_14-30-26.png" alt="1" style="zoom:50%;" />
 
 抽象语法树（AST，**是在生成语法分析树后，再对语法分析树进行visit生成的**）是用一种树形结构（即我们在大学数据结构与算法课程中学过的树）来表示SQL想要表述的语义，将一段SQL字符串结构化，以支持SQL执行引擎根据AST生成SQL执行计划。在Presto中，Node表示树的节点的抽象。根据语义不同，SQL AST中有多种不同类型的节点，它们继承自Node节点，如下所示：
 
@@ -240,21 +240,21 @@ SqlParser的实现，使用了Antlr4作为解析工具。它首先定义了Antlr
 >
 > [antlr教程](https://wizardforcel.gitbooks.io/antlr4-short-course/content/calculator-visitor.html)
 
-![1](../../img/Snipaste_2023-08-24_14-23-04.png)
+<img src="../../../img/Snipaste_2023-08-24_14-23-04.png" alt="1" style="zoom:50%;" />
 
 对于第一步中接收到的SQL(TPC-DS Query55)，我们来看一下它对应的AST长什么样？（细节比较多，请一定要点击图片看大图）
 
-![1](../../img/Snipaste_2023-08-24_16-55-37.png)
+![1](../../../img/Snipaste_2023-08-24_16-55-37.png)
 
 **这一步，我们可以拿到一个用户Statement来表示的根的AST树，在后面我们将会使用它来生成执行计划。**
 
 **上面这张图就是通过visit模式遍历语法分析tree生成的，语法分析tree如下图所示**
 
-![语法分析树](../../img/Snipaste_2023-08-24_17-04-16.png)
+![语法分析树](../../../img/Snipaste_2023-08-24_17-04-16.png)
 
 **继承Visitor类，对语法分析树进行visit来开发自己的业务逻辑代码，最终生成Statement来表示的根的AST。如下图所示，就是visit结束后返回的结果，等同于上面的AST**
 
-![1](../../img/Snipaste_2023-08-24_16-51-54.png)
+![1](../../../img/Snipaste_2023-08-24_16-51-54.png)
 
 
 
@@ -275,11 +275,11 @@ resourceGroupManager.submit(dispatchQuery, selectionContext, dispatchExecutor);
 
 首先是通过线程池调用了如图所示方法栈:
 
-![1](../../img/Snipaste_2023-09-03_12-30-16.png)
+![1](../../../img/Snipaste_2023-09-03_12-30-16.png)
 
 在waitForMinimumWorkers()方法中，通过调用`io.airlift.concurrent.MoreFutures.addSuccessCallback`方法异步执行lambda表达式（**addSuccessCallback方法的调用链具体可见上图所示**）。然后在lambda表达式中再通过addSuccessCallback方法执行` () -> startExecution(queryExecution), queryExecutor`，在startExecution(queryExecution)中最终会执行到SqlQueryExecution::start()方法，如下图所示：
 
-![1](../../img/Snipaste_2023-09-03_12-53-00.png)
+![1](../../../img/Snipaste_2023-09-03_12-53-00.png)
 
 ```java
 // File: SqlQueryExecution.java
@@ -365,33 +365,33 @@ public Plan plan(Analysis analysis, Stage stage, boolean collectPlanStatistics)
 
 > 生成逻辑计划主要还是由RelationPlanner进行visit访问，但是因为语义分析已经将AST用Map进行保存，所以就在visit时就可直接从analysis中获取
 
-<img src="../../img/Snipaste_2023-09-12_20-25-56.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_20-25-56.png" style="zoom:50%;" />
 
 这里我们重点关注的是：PlanNode树长什么样？
 
 首先PlanNode也是类似Node那样是一个abstract class，有多个其他的PlanNode类型继承自PlanNode，是多层父子类继承结构，如下：
 
-![](../../img/00a6f26568031b1869926d78366cea4d.png)
+![](../../../img/00a6f26568031b1869926d78366cea4d.png)
 
 对于TCP-DS Query55（见上面第一步Presto接收到的SQL），它对应的逻辑执行计划树是下图所示，还没有优化过：
 
-![](../../img/Snipaste_2023-09-11_17-24-54.png)
+![](../../../img/Snipaste_2023-09-11_17-24-54.png)
 
 **下图展示的正是源码中逻辑计划，与上图一样**
 
-![](../../img/Snipaste_2023-09-12_14-20-04.png)
+![](../../../img/Snipaste_2023-09-12_14-20-04.png)
 
 > 注意，此时未经过优化的逻辑计划中，TableScanNode输出的是所有的列，但是经过优化后的逻辑计划中TableScanNode的输出是根据sql查询需要的列，如下图所示
 
-<img src="../../img/Snipaste_2023-09-12_19-17-55.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_19-17-55.png" style="zoom:50%;" />
 
 **优化后的**
 
-<img src="../../img/Snipaste_2023-09-12_19-06-48.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_19-06-48.png" style="zoom:50%;" />
 
-<img src="../../img/Snipaste_2023-09-12_19-09-23.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_19-09-23.png" style="zoom:50%;" />
 
-<img src="../../img/Snipaste_2023-09-12_19-01-57.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_19-01-57.png" style="zoom:50%;" />
 
 
 
@@ -413,11 +413,11 @@ public interface PlanOptimizer {
 }
 ```
 
-![](../../img/Snipaste_2023-09-12_14-31-09.png)
+![](../../../img/Snipaste_2023-09-12_14-31-09.png)
 
 对于TCP-DS Query55（见上面第一步Presto接收到的SQL），它对应的优化后的逻辑执行计划树如下图所示
 
-![](../../img/c89244a362e20209162f3f8a201d215d.png)
+![](../../../img/c89244a362e20209162f3f8a201d215d.png)
 
 
 
@@ -458,7 +458,7 @@ private PlanRoot doPlanQuery() {
 
 只是文字描述还是太抽象，我们直接看上一步生成的执行计划划分完PlanFragment之后的样子，如下图所示（图画的丑了点）：
 
-![img](../../img/6f90ec69fef6927fdfafe67d05dd3a9a.png)
+![img](../../../img/6f90ec69fef6927fdfafe67d05dd3a9a.png)
 
 
 
@@ -472,7 +472,7 @@ private PlanRoot doPlanQuery() {
 
 如下图所示，我们执行了TPC-DS Query55（见第一步中接收到的SQL），从Presto WebUI上扒下来了它的完成优化并且划分了Stage后的执行计划（点击看大图），这个执行计划树的结构与我们上一步看到的优化后的执行计划树是一样的，只是根据ExchangeNode拆分了5个Stage（同时这个5个Stage与前面地六步说的PlanFragment一一对应）：
 
-<img src="../../img/1156bc6a246d450453bde966d87acb7a.png" style="zoom:80%;" />
+<img src="../../../img/1156bc6a246d450453bde966d87acb7a.png" style="zoom:80%;" />
 
 在这一步，Presto要做的事情是创建SqlStageExecution（俗称Stage），我们在前面说过，Stage与PlanFragment是一一对应的。这里只是创建Stage，但是不会去调度执行它，这个动作在后面的流程再详细介绍。
 
@@ -634,7 +634,7 @@ private void schedule() {
 
 对于本文举例的TPC-DS Query55 SQL来说，上面的代码翻译成流程图就是：
 
-<img src="../../img/087c2c48b160c1200e3735e27ecae8f1.png" style="zoom:50%;" />
+<img src="../../../img/087c2c48b160c1200e3735e27ecae8f1.png" style="zoom:50%;" />
 
 接下来我们分别介绍一下这三件事具体是什么：
 
@@ -661,13 +661,13 @@ public interface StageScheduler extends Closeable {
 
 到目前为止StageScheduler有4个实现类，分别对应了4种不同的Stage调度方式，如下图所示，最常用到的是SourcePartitionedScheduler与FixedCountScheduler，本文暂时也只会介绍这两个StageScheduler。
 
-<img src="../../img/Snipaste_2023-09-12_15-19-53.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_15-19-53.png" style="zoom:50%;" />
 
 **3.8.2 Schedule Split & Task：绑定Presto Worker（Node）与上游数据源Split的关系、创建Task并调度到Presto Worker上**
 
 StageScheduler的职责是绑定Presto Worker（Node）与上游数据源Split的关系、创建Task并调度到Presto Worker上。在本文的SQL举例TPC-DS Query55中，5个StageScheduler，只用到了其中的两个SourcePartitionedScheduler与FixedCountScheduler，接下来会详细介绍一下。如下图我们在IDEA中debug时的截图：
 
-<img src="../../img/Snipaste_2023-09-12_15-47-57.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_15-47-57.png" style="zoom:50%;" />
 
 **3.8.2.1 StageId = 2、3、4，对应的是SourcePartitionedScheduler**
 
@@ -768,7 +768,7 @@ public class FixedCountScheduler implements StageScheduler {
 
 某个Query的多个Stage之间由于是不同的Task在内存做数据计算，下游的Task必然需要拉取来自上游Task的计算结果。对于一个下游Stage的Task来说，它是怎么知道上游Task在哪里，上游Task的计算结果又输出到哪里了呢？这就需要构建一个Query所有Stage之间的数据链路（StageLinkage，这个概念在Presto的代码中也存在），上游Stage如果创建和调度了任务，它就需要告知下游Stage：“我在这些Presto Worker上创建了这些任务，你可以来拉取数据”，而下游Stage会回复：“好的，我会把这些Task作为我的SourceTask，在我去创建和调度Task时，会把这些SourceTask注册为RemoteSplit，通过Presto统一的数据交换体系来拉取你输出的数据”。整个过程如下图所示：
 
-<img src="../../img/4465f35d8a71fd0a512c4bd87d0c2136.jpg" style="zoom:50%;" />
+<img src="../../../img/4465f35d8a71fd0a512c4bd87d0c2136.jpg" style="zoom:50%;" />
 
 某个Stage的数据来源有两种，一种是数据源Connector，一种是上游Stage的Task输出到OutputBuffer的数据，对于下游的Stage来说，上游Stage的Task可以称之为source task。这些source task是通过SqlStageExecution::addExchangeLocations()注册到了下游SqlStageExecution中，让下游Stage知道了去哪里取数据。无论是哪一种数据源，Presto都统一抽象为了ConnectorSplit。当上游Stage作为数据源时，Presto把它看作是一种特殊的Connector，它的catalog name = $remote，其实就是个假的catalog，ConnectorSplit的实现类是RemoteSplit。
 
@@ -786,7 +786,7 @@ SELECT Id, Name, Age, (Age - 30) * 50 AS BonusFROM PeopleWHERE Age > 30
 
 对应火山模型如下：
 
-<img src="../../img/Snipaste_2023-09-12_19-24-11.png" style="zoom:50%;" />
+<img src="../../../img/Snipaste_2023-09-12_19-24-11.png" style="zoom:50%;" />
 
 先来解释一下上图的含义：
 
@@ -831,7 +831,7 @@ Operator链有简单的也有复杂的，如下图：
 
 前面之所以要介绍Volcano执行模型，是因为Presto Worker的任务执行代码，能见到Volcano模型的Operator、Exchange，next这些概念，Presto也是一定程度上参考这个做的，算是给到了一些理论支撑。毕竟Presto没有提供相关设计文档，我们除了代码什么参考资料都没有，看看Volcano的论文多少能熟悉一点。但是Presto官方论文也说过，Presto的执行模型是“More than Volcano”，它做的事可能比Volcano更复杂。我们拿代码结合论文来讲一下，这里以TPC-DS Query55（SQL见第一步中的介绍）的Stage1中的任意Task的执行为例，如下图所示：
 
-<img src="../../img/5f968182880f8739f1dc37aee1e7bb3e.png" style="zoom:50%;" />
+<img src="../../../img/5f968182880f8739f1dc37aee1e7bb3e.png" style="zoom:50%;" />
 
 上图的含义是，Presto的Task执行流程是类似Volcano执行模型一样，首先根据执行计划，将多个operator串联起来。无论是来自数据源Connector的数据还是上游Stage输出的数据，从上游流入后，经过前面的operator处理再输出给后面的operator，最终输出到下游。
 
@@ -839,7 +839,7 @@ Operator链有简单的也有复杂的，如下图：
 
 1. Split：Split包含的信息可以让Presto Task知道去哪里拉取上游的数据，它是数据分区的基本单位（如果你愿意把它叫做partition也可以，就像Kafka那样）。上游数据源Connector的Split是ConnectorSplit，上游Stage的Split是RemoteSplit。RemoteSplit其实是ConnectorSplit接口的一个实现类，Presto在类似的逻辑上实现了高度的统一抽象。
 
-\2. Operator：Presto代码中定义的Operator与Volcano执行模型的Operator含义是相同的。如下是Operator接口的定义，我们可以看到它与Volcano执行模型中给出的Operator基本类似：
+2. Operator：Presto代码中定义的Operator与Volcano执行模型的Operator含义是相同的。如下是Operator接口的定义，我们可以看到它与Volcano执行模型中给出的Operator基本类似：
 
 - Operator初始化没有专门定义open()方法，因为每个Operator接口实现类的构造函数完全可以完成Operator的初始化。
 - addInput(): 交给Operator一个数据的Page去处理，这个Page我们可以暂且理解为是一批待处理的数据。
@@ -873,7 +873,7 @@ Operator有许多实现类，代表了不同的Operator计算逻辑，可以参�
 - ExchangeOperator：Stage之间的Task做数据交换用的，下游Stage的ExchangeClient从上游OutputBuffer拉取数据。
 - JoinOperator：用于连接多个上游，与SQL中的JOIN同义。
 
-\3. Page/Block/Slice
+3. Page/Block/Slice
 
 可能你已经注意到，Operator的接口定义中，无论是addInput()的入参还是getOutput()的返回值，它们都是Page，也就是Operator的操作对象是Page。还记得吗？Volcano执行模型中，每次调用Operator::next()的操作对象是Row（数据中的一条记录），如果数据读取的IO是瓶颈这里不会有问题，然而20年过去了，IO性能提升了很多，但是这种每次函数调用都只处理一条记录，却带来了大量的出入栈以及虚函数调用开销，同时也不是CPU Cache友好的，有一项统计指出这种one by one的处理方式，90%以上的CPU开销都是没有浪费的。自然而然我们能够想到要一次函数调用处理多条记录。
 
@@ -947,7 +947,7 @@ private ListenableFuture<?> processInternal(OperationTimer operationTimer) {
 
 对于划分了多个Stage的Query，数据依赖关系上相邻的2个Stage必然存在着数据交换，而同一个Stage的所有Task之间是没有数据交换的。Presto的数据交换采用的是Pull Based方式，如下图所示，Stage3的Task计算结果输出到它所在的Presto Worker的OutputBuffer中，再由Stage2的Task的Exchange Client拉取过来进行后续的Operator计算，计算完再输出給下一个Stage，最终所有的Stage计算完成后，输出最终计算结果给Presto SQL Client。其实用“数据交换（Exchange）”这个词语并不准确，Stage之间并没有交换数据，而只是后面执行的Stage从前面执行的Stage拉取数据。
 
-<img src="../../img/1d35d441112a18cb8337f9d047c0d113.png" style="zoom:50%;" />
+<img src="../../../img/1d35d441112a18cb8337f9d047c0d113.png" style="zoom:50%;" />
 
 Presto在实现这一套机制的时候，做了比较好的抽象，Stage间的数据交换连同包含TableScanOperator的Stage从Connector取数据这部分，统一实现为拉取数据源（Connector）的ConnectorSplit拉取逻辑，只不过Stage从Connector拉取的是某个Connector实现的ConnectorSplit（如HiveConnector的HiveSplit），Stage之间拉取的是RemoteSplit（RemoteSplit实现了ConnectorSplit的接口）。
 

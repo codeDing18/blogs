@@ -113,7 +113,7 @@ public class ServiceModule implements Module {
 
 启动服务后，通过 jconsole查看。
 
-![](../img/Snipaste_2023-09-08_16-02-02.png)
+![](../../img/Snipaste_2023-09-08_16-02-02.png)
 
 
 
