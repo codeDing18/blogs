@@ -395,7 +395,7 @@ public Plan plan(Analysis analysis, Stage stage, boolean collectPlanStatistics)
 
 
 
-## **3.5 第五步：【Coordinator】优化执行计划，生成Optimized Logical Plan**
+### 3.5 第五步：【Coordinator】优化执行计划，生成Optimized Logical Plan
 
 上一步生成的逻辑执行计划，如果直接去执行，可能执行效率不是最优的，Presto的执行计划生成过程，还有一个优化执行计划的过程，在这个过程中，它会以RBO和CBO的方式用系统中已有的优化器来完成执行计划的优化。RBO指的是基于规则的优化（Rule Based Optimization），如：将Filter下退，在SCAN表的时候完成数据的过滤。CBO指的是基于成本的优化（Cost Based Optimization），如：有多个表的Join时，需要根据表的大小来选择Join的顺序以优化执行效率，基于成本优化，需要收集大量的统计信息才能够做出决策，从这一点上来说，CBO比RBO要复杂很多。
 
@@ -425,7 +425,7 @@ public interface PlanOptimizer {
 
 
 
-## **3.6 第六步：【Coordinator】为逻辑执行计划分段(PlanFragment)**
+### **3.6 第六步：【Coordinator】为逻辑执行计划分段(PlanFragment)**
 
 优化完执行计划后，紧接着下一步就是为逻辑执行计划（PlanNode树）分段（划分PlanFragment），生成SubPlan，我们再回看一下SqlQueryExecution::doPlanQuery()的代码：
 
@@ -462,7 +462,7 @@ private PlanRoot doPlanQuery() {
 
 
 
-## **3.7 第七步：【Coordinator】创建SqlStageExecution（创建Stage）**
+### **3.7 第七步：【Coordinator】创建SqlStageExecution（创建Stage）**
 
 在Presto的执行模型中，SQL的执行被划分为几个层次，分别是：
 
@@ -576,7 +576,7 @@ public interface ConnectorSplit {
 
 
 
-## **3.8 第八步：【Coordinator】Stage调度-生成HttpRemoteTask并分发到Presto Worker**
+### **3.8 第八步：【Coordinator】Stage调度-生成HttpRemoteTask并分发到Presto Worker**
 
 让我们继续回看SqlQueryExecution::start()方法，此方法串起来了执行计划的生成以及调度，代码及注释如下：
 
@@ -772,7 +772,7 @@ public class FixedCountScheduler implements StageScheduler {
 
 某个Stage的数据来源有两种，一种是数据源Connector，一种是上游Stage的Task输出到OutputBuffer的数据，对于下游的Stage来说，上游Stage的Task可以称之为source task。这些source task是通过SqlStageExecution::addExchangeLocations()注册到了下游SqlStageExecution中，让下游Stage知道了去哪里取数据。无论是哪一种数据源，Presto都统一抽象为了ConnectorSplit。当上游Stage作为数据源时，Presto把它看作是一种特殊的Connector，它的catalog name = $remote，其实就是个假的catalog，ConnectorSplit的实现类是RemoteSplit。
 
-## **3.9 第九步：【Worker】在Presto Worker上执行任务，生成Query结果**
+### **3.9 第九步：【Worker】在Presto Worker上执行任务，生成Query结果**
 
 **3.9.1 什么是Volcano 执行模型？**
 
