@@ -18,7 +18,7 @@
   - [hadoop](大数据/hadoop)
     - [安装配置](大数据/hadoop/安装配置.md)
   - [alluxio](大数据/alluxio/)
-- [HA](HA/)
+- HA
   - [keepalived](HA/keepalived.md)
 - [Git](git.md)
 - [论文阅读](论文阅读/)
