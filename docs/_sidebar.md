@@ -12,7 +12,13 @@
     - [presto设计](大数据/presto/presto设计.md)
     - [airlift](大数据/presto/airlift.md)
     - [Guice](大数据/presto/Guice.md)
+  - hudi
+    - [hudi报错](大数据/hudi/hudi报错.md)
+    - [hudi使用](大数据/hudi/hudi使用.md)
+    - [hudi原理](大数据/hudi/hudi原理.md)
   - spark
+    - 源码阅读
+      - [spark-sql](大数据/spark/源码阅读/spark-sql.md)
   - hive
     - [安装配置](大数据/hive/安装配置.md)
   - hadoop
