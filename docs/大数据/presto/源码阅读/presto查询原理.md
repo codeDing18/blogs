@@ -83,7 +83,7 @@ limit 10;
 
 简介：在TPC-DS的数据模型中，store_sales是事实表，date_dim与item是维度表。上面SQL的业务含义是对商店销售数据的分品牌统计。
 
-### **3.1 第一步：【Coordinator】接收SQL Query请求**
+### 3.1 第一步：【Coordinator】接收SQL Query请求
 
 Presto-Cli提交的Query，会以HTTP POST的方式请求到Presto集群的Coordinator。请求体中携带了SQL以及其他信息。
 
@@ -224,7 +224,7 @@ private <C> void createQueryInternal(QueryId queryId, Span querySpan, Slug slug,
 
 
 
-### **3.2 第二步：【Coordinator】词法与语法分析（生成AST）**
+### 3.2 第二步：【Coordinator】词法与语法分析（生成AST）
 
 在这一步中，SqlParser拿到一个SQL字符串，通过词法语法解析后，生成抽象语法树（AST）。
 
@@ -305,7 +305,7 @@ public void start()
 
 
 
-### **3.4 第四步：【Coordinator】语义分析(Analysis)、生成执行计划LogicalPlan**
+### 3.4 第四步：【Coordinator】语义分析(Analysis)、生成执行计划LogicalPlan
 
 接下来要讲的第四步、第五步、第六步，他们的执行流程都体现在了SqlQueryExecution::doPlanQuery()中，代码如下：
 
@@ -425,7 +425,7 @@ public interface PlanOptimizer {
 
 
 
-### **3.6 第六步：【Coordinator】为逻辑执行计划分段(PlanFragment)**
+### 3.6 第六步：【Coordinator】为逻辑执行计划分段(PlanFragment)
 
 优化完执行计划后，紧接着下一步就是为逻辑执行计划（PlanNode树）分段（划分PlanFragment），生成SubPlan，我们再回看一下SqlQueryExecution::doPlanQuery()的代码：
 
@@ -462,7 +462,7 @@ private PlanRoot doPlanQuery() {
 
 
 
-### **3.7 第七步：【Coordinator】创建SqlStageExecution（创建Stage）**
+### 3.7 第七步：【Coordinator】创建SqlStageExecution（创建Stage）
 
 在Presto的执行模型中，SQL的执行被划分为几个层次，分别是：
 
@@ -576,7 +576,7 @@ public interface ConnectorSplit {
 
 
 
-### **3.8 第八步：【Coordinator】Stage调度-生成HttpRemoteTask并分发到Presto Worker**
+### 3.8 第八步：【Coordinator】Stage调度-生成HttpRemoteTask并分发到Presto Worker
 
 让我们继续回看SqlQueryExecution::start()方法，此方法串起来了执行计划的生成以及调度，代码及注释如下：
 
@@ -772,7 +772,7 @@ public class FixedCountScheduler implements StageScheduler {
 
 某个Stage的数据来源有两种，一种是数据源Connector，一种是上游Stage的Task输出到OutputBuffer的数据，对于下游的Stage来说，上游Stage的Task可以称之为source task。这些source task是通过SqlStageExecution::addExchangeLocations()注册到了下游SqlStageExecution中，让下游Stage知道了去哪里取数据。无论是哪一种数据源，Presto都统一抽象为了ConnectorSplit。当上游Stage作为数据源时，Presto把它看作是一种特殊的Connector，它的catalog name = $remote，其实就是个假的catalog，ConnectorSplit的实现类是RemoteSplit。
 
-### **3.9 第九步：【Worker】在Presto Worker上执行任务，生成Query结果**
+### 3.9 第九步：【Worker】在Presto Worker上执行任务，生成Query结果
 
 **3.9.1 什么是Volcano 执行模型？**
 
