@@ -9,6 +9,7 @@
       - [自动配置](大数据/presto/源码阅读/自动配置.md)
       - [语义分析](大数据/presto/源码阅读/语义分析.md)
       - [presto-jdbc](大数据/presto/源码阅读/presto-jdbc.md)
+      - [set session](大数据/presto/源码阅读/set session.md)
     - [presto设计](大数据/presto/presto设计.md)
     - [airlift](大数据/presto/airlift.md)
     - [Guice](大数据/presto/Guice.md)
