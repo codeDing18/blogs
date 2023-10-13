@@ -79,5 +79,15 @@ git checkout -b 分支名称 标签名称
 
 
 
+## git cherry-pick 
+
+`git cherry-pick`命令的作用，就是将指定的提交（commit）**（git log查看commit id）**应用于其他分支。
+
+```bash
+git checkout 分支
+git cherry-pick commit id
+git cherry-pick <HashA> <HashB>  #将 A 和 B 两个提交应用到当前分支
+```
+
 
 
