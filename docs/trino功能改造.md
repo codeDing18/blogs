@@ -1,5 +1,7 @@
 # trino任务
 
+- **calcite物理计划交给谁执行**
+
 - hdfs那debug，尝试下如果没有hadoop配置，启动trino会出问题吗(会读取环境变量，根据环境变量Hadoop home的目录，去读取etc/hadoop下的配置文件)，所以只需要看下trino是怎么读取hdfs中文件的
 
 - desc时，分区表不会显示分区字段，但是hive会显示分区字段，见gitlab中的issue
