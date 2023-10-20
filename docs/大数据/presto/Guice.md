@@ -385,3 +385,19 @@ class AOPModule implements Module {
 
 在 Preto 节点启动过程中，通过 NodeModule 加载本地配置、通过 DiscoveryModule 向 coordinator 发送注册信息、通过 HttpServerModule 提供 HTTP 服务或创建 HTTP Client，每个模块内都可以看到 Guice 的身影，想更深入的了解 Presto 的实现，以 Guice 的 Module 作为切入点是最佳的选择。
 
+
+
+## 问题
+
+- 在bind后，这个实例什么才被创建
+
+  > 如果是jaxrsBinder、configBinder或者是bind时指定in(Scopes.SINGLETON)，那么在bootstrap.initialize()时就会创建实例。
+  >
+  > ```java
+  > Bootstrap bootstrap = new Bootstrap(modules);
+  > Injector injector = bootstrap.initialize();
+  > ```
+  >
+  > in(Scopes.SINGLETON)是通过initialize()调用链调用loadEagerSingletons来创建实例
+
+  

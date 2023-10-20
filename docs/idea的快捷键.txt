@@ -1,0 +1,7 @@
+Mac中
+command+p可以查看参数
+control+h可以查看接口或着类的结构
+command+option+f可以将创建的变量直接变为类的属性
+command+7可以查看一个类内部所有方法
+command+o可以搜索想要的类等
+option+command+方向键⬅️就可以返回上次查看方法的代码中

@@ -25,6 +25,7 @@
   - hadoop
     - [安装配置](大数据/hadoop/安装配置.md)
   - alluxio
+  - [kerberos](大数据/Kerberos.md)
 - HA
   - [keepalived](HA/keepalived.md)
 - Git
