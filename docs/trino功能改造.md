@@ -4,11 +4,7 @@
 
 - hdfs那debug，尝试下如果没有hadoop配置，启动trino会出问题吗(会读取环境变量，根据环境变量Hadoop home的目录，去读取etc/hadoop下的配置文件)，所以只需要看下trino是怎么读取hdfs中文件的
 
-- desc时，分区表不会显示分区字段，但是hive会显示分区字段，见gitlab中的issue
-
 - use hive.default;describe test;debug看下这个hive表的string是怎么在trino中变为varchar的
-
-- 学习kerberos: klist
 
 - trino plugin加载机制（看看后面怎么做hive udf的动态加载）
 
@@ -32,17 +28,11 @@
 
 - 对group by的优化，目前初步想法是参考https://github.com/trinodb/trino/issues/14237（hummingbird）中的向量化方法
 
-- presto的算子、资源管理和调度、查询优化、shuffle过程
-
-- sql中的关系代数
-
 - trino对hudi mor的优化(目前是非分区表在update后查询不到update的数据，分区表是spark没有在metadata中写入相关信息)
 
 - trino 的connector与function机制的实现 hive udf的动态加载
 
-- trino中优化后的逻辑计划
-
-- 对group by的优化，目前初步想法是参考https://github.com/trinodb/trino/issues/14237（hummingbird）中的向量化方法
+  
 
   
 
@@ -54,7 +44,15 @@ https://xie.infoq.cn/article/ef46f810f0d57fd14cd48b6e5
 
 
 
+# 美团
 
+[https://zhuanlan.zhihu.com/p/408957032](https://zhuanlan.zhihu.com/p/408957032)
+
+
+
+
+
+# 滴滴
 
 
 
@@ -95,6 +93,20 @@ https://xie.infoq.cn/article/ef46f810f0d57fd14cd48b6e5
 # sqlscan工具
 
 https://mp.weixin.qq.com/s/Sa1jI_-1fxNOLQxhi24BRg
+
+
+
+
+
+
+
+# gateway智能选择查询引擎
+
+Presto 接入了查询路由 Gateway，Gateway 会智能选择合适的引擎，用户查询优先请求 Presto，如果查询失败，会使用 Spark 查询，如果依然失败，最后会请求 Hive。在 Gateway 层，我们做了一些优化来区分大查询、中查询及小查询，对于查询时间小于 3 分钟的，我们即认为适合 Presto 查询，比如通过 HBO（基于历史的统计信息）及 JOIN 数量来区分查询大小，架构图如下：
+
+https://mp.weixin.qq.com/s?__biz=MzU3MzgwNTU2Mg==&mid=2247497505&idx=1&sn=6ae3547d253cf76afe4c813d850e999d&chksm=fd3eb1b4ca4938a253b7f0d54d35eaf110890f24d846a5c9ee85e48a2884bb4ad526ea0eccb1&scene=21#wechat_redirect
+
+
 
 
 

@@ -3,8 +3,8 @@
 - 设计模式
 - 大数据
   - sql引擎资料
-    - [Calcite 和 SQL 引擎学习资料总结](大数据/sql引擎资料/Calcite 和 SQL 引擎学习资料总结 .md)
-    - [SQL引擎发表、落地论文总结](大数据/sql引擎资料/SQL引擎发表、落地论文总结.md)
+    - [SQL引擎学习资料总结](大数据/sql引擎资料/SQL引擎学习资料总结 .md)
+    - [SQL引擎论文总结](大数据/sql引擎资料/SQL引擎论文总结.md)
   - presto
     - 源码阅读
       - [presto查询原理](大数据/presto/源码阅读/presto查询原理.md)

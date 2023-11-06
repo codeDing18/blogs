@@ -198,13 +198,15 @@ systemctl start kadmin krb5kdc
 
 ```shell
 kadmin.local
+# 或者不进入这个模式,如下命令执行
+kadmin.local -q "listprincs"
 ```
 
 > 如果有访问 KDC 服务器的 root 权限，但没有 kerberos admin 账户，使用 `kadmin.local`。
 >
 > 如果没有访问 KDC服务器的 root 权限，但用 kerberos admin 账户，使用 `kadmin`。
 >
-> 还可以使用`kadmin.local -q "命令"`的方式直接从shell操作kadmin数据库。
+> **还可以使用`kadmin.local -q "命令"`的方式直接从shell操作kadmin数据库。**
 
 输入"?"可以获取到所有命令和解释：
 
@@ -262,7 +264,7 @@ krbtgt/PAUL.COM@PAUL.COM
 添加一个principal。如果没有指定`-randkey`或`-nokey`参数，需要指定一个密码。
 
 ```shell
-kadmin.local:  addprinc demo/localhost
+kadmin.local:  addprinc -randkey demo/localhost
 WARNING: no policy specified for demo/localhost@PAUL.COM; defaulting to no policy
 Enter password for principal "demo/localhost@PAUL.COM":
 Re-enter password for principal "demo/localhost@PAUL.COM":
@@ -347,13 +349,13 @@ Entry for principal demo/localhost@PAUL.COM with kvno 4, encryption type des-cbc
 
 > 我们在`kdc.conf`的`supported_enctypes`配置项指定了8种加密算法，因此这里会打印出8个entry。
 
-使用keytab方式认证的命令如下：
+**使用keytab方式认证的命令如下：**
 
 ```shell
 kinit -kt demo.keytab demo/localhost@PAUL.COM
 ```
 
-我们可以使用`ktadd`命令，将多个principal加入同一个keytab文件，这样该keytab文件可用于认证多个用户。例如：
+**我们可以使用`ktadd`命令，将多个principal加入同一个keytab文件，这样该keytab文件可用于认证多个用户。例如**：
 
 ```shell
 kadmin.local:  addprinc test/localhost@PAUL.COM
