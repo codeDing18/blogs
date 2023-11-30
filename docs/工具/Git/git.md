@@ -91,3 +91,6 @@ git cherry-pick <HashA> <HashB>  #将 A 和 B 两个提交应用到当前分支
 
 
 
+# 参考
+
+- [Git 的奇技淫巧](https://hellogithub.com/article/9aed28d4d64b4649bb364685ef557ae4)
