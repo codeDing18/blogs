@@ -826,8 +826,14 @@ Operator链有简单的也有复杂的，如下图：
 世界上大部分单机或分布式的数据库以及SQL执行引擎，都是这种Operator-Based 执行模型。Volcano执行模型诞生于20多年前，一个数据读取IO瓶颈更严重的时代，Vocalno模型虽然CPU不友好，也不要紧，现如今IO的性能有了较大提升，CPU的计算显得更加吃力一些，Volcano模型的问题就比较突出了。当然为了运行效率，现代的数据库或查询引擎是做过很多优化的，我们最常听到的几种优化是：
 
 - 批量化（Batch Processing）：next()方法从每次只处理一条记录，改为处理多条，平摊了函数调用成本。
+
 - 向量化执行（Vectorized Execution）：包含CPU的SIMD指令、循环loop unrolling，也包含列示存储和计算。这些底层的软件编码优化，大大提高了处理一批数据的性能。
+
 - 代码生成（Code Generation）：Volcano的operator链在执行时，需要层层调用next()带来深层次的调用栈，在本篇最后参考资料的一篇中有提到，这种方式的效率还不如大学新生手写的代码。我们可以利用自动代码生成一个铺平的方法，去掉函数的调用，把层层调用的operator计算逻辑都安置在一起，经过数据实测，CPU能节省70%～90%的时间分片，去做更多真正有意义的计算逻辑。Apache Spark在这方面优化的比较狠，你可能听说过Whole Stage Code Generation，Spark先让开发者去调用各种算子完成计算逻辑，真正开始运行时，它会用Code Generation重新生成一些Stage的字节码。
+
+  > 代码生成看下图更好理解，按照原先的火山模型需要依次调用next方法，但实际上可以将算子的代码逻辑直接整合到一起，不需要再调用next
+
+  ![](../../../img/Snipaste_2023-12-26_17-13-39.png)
 
 **3.9.2 Presto Operator Based Execution Pipeline**
 
