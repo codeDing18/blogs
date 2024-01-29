@@ -10,10 +10,6 @@
 2. Presto 的 Coordinator 与 Worker 是怎么联系起来的？
 3. 配置了个服务发现，它是怎么工作的？
 
-这方面的资料特别少，基本上只有啃源码，但是怎么啃真是一点头绪都没有。于是我搜遍了全网，找了一个日本博主的文章。这篇文章给了我很多启发。
-
-以下主要是对博主的文章进行翻译，然后丰富里面的流程内容，并且带上我自己的理解。
-
 代码主要是基于 Trino 结合
 
 最后根据文中的内容看看是否能解答这3个问题。
@@ -223,7 +219,7 @@ public void start()
         // announce immediately, if discovery is running
         ListenableFuture<Duration> announce = announce(System.nanoTime(), new Duration(0, SECONDS));
         try {
-            announce.get(30, SECONDS); // 30秒的生命周期
+            announce.get(30, SECONDS); // 30秒的生命周期，在服务端设置好了。
         }
         catch (Exception ignored) {
         }
@@ -393,7 +389,8 @@ public void put(Id<Node> nodeId, DynamicAnnouncement announcement)
     byte[] key = nodeId.getBytes();
     byte[] value = codec.toJsonBytes(services);
 
-    store.put(key, value, maxAge); // 30秒设置到maxAge这个变量中了
+  	// 30秒设置到maxAge这个变量中了。服务端的DiscoveryConfig中默认设置了maxAge为30秒，所以每次生命周期     // 为30秒
+    store.put(key, value, maxAge);
 }
 ```
 
